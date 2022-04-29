@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[]){
     char copied_text;
-    DIR* dir = opendir("C:\\Users\\anton\\OneDrive\\Desktop\\Word_Count_Project\\file_text");
+    DIR* dir = opendir("");
     FILE* fPointer;
     long int res;
 
