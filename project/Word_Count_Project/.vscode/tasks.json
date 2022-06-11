@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+      {
+          "type": "shell",
+          "label": "MPI compile active file (mpicc)",
+          "command": "docker run -it --cap-add=SYS_PTRACE --mount src=\"$(pwd)\",target=/home,type=bind spagnuolocarmine/docker-mpi:latest mpicc -g /home/${fileBasename} -o /home/${fileBasenameNoExtension}",
+          "presentation": {
+              "reveal": "always"
+          },
+          "problemMatcher": [
+              "$eslint-compact"
+          ],
+          "group": {
+              "kind": "build",
+              "isDefault": true
+          }
+      },
+      {
+          "type": "shell",
+          "label": "MPI run active file (mpicc && mpirun)",
+          "command": "docker run -it --cap-add=SYS_PTRACE --mount src=\"$(pwd)\",target=/home,type=bind spagnuolocarmine/docker-mpi:latest mpirun --allow-run-as-root -np ${input:np} /home/${fileBasenameNoExtension}",
+          "dependsOn": [
+              "MPI compile active file (mpicc)"
+          ],
+          "presentation": {
+              "reveal": "always"
+          },
+          "problemMatcher": [
+              "$eslint-compact"
+          ]
+      }
+  ],
+      "inputs": [
+        {
+          "id": "np",
+          "description": "Number of processes:",
+          "default": "8",
+          
+          "type": "promptString"
+        }
+  ]
+}
