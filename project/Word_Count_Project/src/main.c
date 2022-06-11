@@ -9,83 +9,7 @@
 #define MAX_SPLIT 1000
 #define NUM_FILES 2
 #define MASTER 0
-#define num_processor 2
 
-/*
-int main(int argc, char *argv[])
-{
-    int num_proc = 3;
-    long tot_words_in_files = 0;
-    int words_for_processor[num_proc];
-
-    int numSplit = 0;
-    StructWordForProcess *wordForProcessor = (StructWordForProcess *)malloc(sizeof(StructWordForProcess) * MAX_SPLIT);
-    WordFreq *dictionary = (WordFreq *)malloc(sizeof(WordFreq) * TOTALWORDS);
-
-    // Contiamo prima il numero di file .txt che abbiamo nella current directory
-    printf("\n");
-    printf("ANALYSIS FILE\n");
-    printf("------------------------------------------------\n");
-    int files_number = numFilesInDirectory(".");
-    printf("Number files with extension .txt: %d\n\n", files_number);
-
-    //indichiamo quanti file vogliamo analizare
-    int num_file = 0;
-    size_t files = 0;                            // variabile che viene incrementata nel metodo è rappresenta il numero di file
-
-    printf("Enter number of file that we'll count word: ");
-    scanf("%d",&num_file);
-    printf("\n");
-    char **list_files = listOfFile(".", &files,num_file); //(char **)malloc(NUM_FILES * sizeof(char));
-
-
-    // dobbiamo stampare le parole totali nei file --> DA FARE
-    File specFile[files_number];
-    printf("LIST OF FILES\n");
-    /*for (int i = 0; i < files; i++)
-    {
-       printf("%s\n", list_files[i]);
-       int words_in_file = numWordInFile(list_files[i]);
-       printf("num-words:%d\n", words_in_file);
-       tot_words_in_files += words_in_file; //sumAllWordsInDifferentFile(list_files[i], specFile,n);
-       free(list_files[i]);
-    }
-    free(list_files);
-    printf("Number of words in all files:%ld\n", tot_words_in_files);
-    //qui c'era l'end del messaggio
-
-    tot_words_in_files = sumAllWordsInDifferentFile(list_files, specFile, &files);
-    printf("Number of words in all files:%ld\n\n", tot_words_in_files);
-
-    printf("------------------------------------------------\n");
-    numWordForProcess(words_for_processor, tot_words_in_files, num_proc);
-    for (int i = 0; i < num_proc; i++)
-    {
-        printf("number of words is:%d for processor:%d\n", words_for_processor[i], i + 1);
-    }
-
-    numSplit = setStructureWordForProcessForSplitFileForProcess(wordForProcessor, num_proc, words_for_processor, specFile);
-    printf("Number of Split: %d\n\n", numSplit);
-
-    printf("------------------------------------------------\n");
-    printf("TEST\n\n");
-
-    int iStruct = 0;
-    int startForZero = 0;
-    int sizeOfZero = 0;
-
-    while (wordForProcessor[iStruct].rank == 0 && iStruct < numSplit)
-    {
-        iStruct++;
-        startForZero++;
-    }
-
-    printf("%d\n", startForZero);
-    sizeOfZero = wordCount(dictionary, wordForProcessor, startForZero);
-
-    return 0;
-}
-*/
 
 int main(int argc, char *argv[])
 {
@@ -193,7 +117,7 @@ int main(int argc, char *argv[])
         }
 
         /* 
-        RUCORDIAMOCI CHE LìULTIMA PAROLA IN UN FILE DEVE ESSERE SEGUITA DA UNO SPAZIO
+         L'ULTIMA PAROLA IN UN FILE DEVE ESSERE SEGUITA DA UNO SPAZIO
         */
 
         numSplit = setStructureWordForProcessForSplitFileForProcess(wordForProcessor, size, words_for_processor, specFile);
