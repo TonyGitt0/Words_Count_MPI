@@ -172,7 +172,6 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("Enter the number of files you want to analyze\n");
             MPI_Finalize();
             return 0;
         }

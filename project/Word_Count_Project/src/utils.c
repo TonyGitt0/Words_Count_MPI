@@ -312,7 +312,7 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
                 //lineToCompare equivale ad una sola parola, quando leggiamo più file con un unico processo 
                 //abbiamo bisogno di size nella funzione word count
                 lineToCompare = (structWord[i].end - structWord[i].start);
-                printf("single_word: %d\n", lineToCompare);
+                //printf("single_word: %d\n", lineToCompare);
                 strtok(allWords, "\n");
                 char *p = strtok(allWords, " ");
                 while (p != NULL)
@@ -320,7 +320,7 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
                     
                     if ((index_word = isWordNew(dictionary, p, lineToCompare, num_proc)) == -3)
                     {
-                        printf("P INTERNO ----- %s\n",p);
+                        //printf("P INTERNO ----- %s\n",p);
                         strcpy(dictionary[new_word_vector].word, p);
                         dictionary[new_word_vector].word_occurency = 1;
                         // printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[new_word_vector].word, dictionary[new_word_vector].word_occurency);
