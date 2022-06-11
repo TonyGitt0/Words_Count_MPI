@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Status status;
 
+    MPI_Barrier(MPI_COMM_WORLD);
+    double time_start = MPI_Wtime();
 
     int tag = 1;
     long tot_words_in_files = 0;
@@ -152,9 +154,6 @@ int main(int argc, char *argv[])
 
     MPI_Type_create_struct(n_items_ss, blocklengths_ss, offsets_ss, types_ss, &d_words);
     MPI_Type_commit(&d_words);
-
-    MPI_Barrier(MPI_COMM_WORLD);
-    double time_start = MPI_Wtime();
 
     if (myrank == 0)
     {
@@ -248,9 +247,7 @@ int main(int argc, char *argv[])
         getDataOfWOrd(dictionary, total_new_words);
         printf("Total words (no-occurency) in all file is: %d\n", total_new_words);
 
-        double time_end = MPI_Wtime();
-        double time = time_end - time_start;
-        printf("Time: %lf\n\n", time);
+      
     }
     else
     {
@@ -260,11 +257,20 @@ int main(int argc, char *argv[])
         MPI_Get_count(&status, dt_received, &count);
 
         new_word_single_processor = wordCount(dictionary, wordForProcessor, count,num_file,size);
-        MPI_Ssend(dictionary, new_word_single_processor, d_words, 0, tag, MPI_COMM_WORLD);
+        MPI_Send(dictionary, new_word_single_processor, d_words, 0, tag, MPI_COMM_WORLD);
     }
 
     MPI_Type_free(&d_words);
     MPI_Type_free(&dt_received);
+
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    if(myrank == 0)
+    {
+        double time_end = MPI_Wtime();
+        double time = time_end - time_start;
+        printf("Time: %lf\n\n", time);
+    }
     MPI_Finalize();
     return 0;
 }
