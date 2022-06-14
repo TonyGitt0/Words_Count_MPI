@@ -12,6 +12,7 @@ ID Project 01312 % 5 == 2
 	* [Compilazione](#compilazione)
 	* [Esecuzione Locale](#esecuzione-locale)
 	* [Esecuzione sul Cluster](#esecuzione-sul-cluster)
+* [Descrizione della Soluzione](#descrizione-della-soluzione)
 
 
 ## Introduzione
@@ -39,5 +40,8 @@ mpirun --allow-run-as-root -np <np> --hostfile <host> <nome-file-esguibile> <num
 Sostituisci:
 - **np**: numero di processori;
 - **num_files**: numero di file da voler analizzare;
+- **nome-file-eseguibile**: il nome del file eseguibile che creiamo;
 - **host**: il path dell'hostfile.
+
+## Descrizione della Soluzione
 
