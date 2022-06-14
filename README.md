@@ -49,7 +49,7 @@ Sostituisci:
 > **Assunzioni**: la seguente implementazione considera l'utilizzo di 24 file di testo composti da 99 parole ripetute per un totale di 50,171 per singolo file. In totale quindi avremo 1.204.104 parole da analizzare. Tali file sono stati autogenerati da uno script Python, dove ogni parola è seguita da uno spazio (compresa l'ultima parola). Il nodo MASTER parteciperà con gli SLAVE alla computazione.
 
 Inizialmente, prima che il processo di Word Count abbia inizio, abbiamo bisogno di inizializzare due strutture importanti: 'dt_recived' e 'd_words'. La prima struttura viene utilizzata per inviare dal MASTER i dati relativi al file che dovrà leggere un determinato SLAVE. I dati che verranno inseriti in tale struttura sono i seguenti: nome file, rank, start ed end. Il nome file indica il nome del file analizzato, i rank rappresentano i processori utilizzati tra i quali si effettuerà la suddivisione dei file, start indica l'inizio del file da cui un processore deve iniziare la sua computazione, end indica la fine del filein cui un processore deve terminare la sua computazione.
-'''c
+```c
     // FIRST STRUCT
     const int n_items_fs = 4;        
     int blocklengths_fs[n_items_fs]; 
@@ -93,4 +93,85 @@ Inizialmente, prima che il processo di Word Count abbia inizio, abbiamo bisogno 
 
     MPI_Type_create_struct(n_items_ss, blocklengths_ss, offsets_ss, types_ss, &d_words);
     MPI_Type_commit(&d_words);
-'''
+```
+Una volta create queste due strutture il nodo MASTER inizia la fase di analisi sui relativi file .txt. Tale analisi comprende il controllo dell'inserimento su riga di comando del numero di file da voler analizzare e mostra la lista dei file presi in considerazione ed il numero di parole totali che compongono questi. 
+
+
+La fase di Analisi è seguita dalla fase di processamento dei file. Durante la fase di processamento dei file attraverso la funzione 'numWordsForProcess' indichiamo il numero di parole che saranno destinate al n-esimo processore, mentre, con la funzione 'setStructureWordForProcessForSplitFileForProcess' rempiamo la struttura 'StructWordForProcess'.
+
+
+Nella funzione 'numWordsForProcess' passeremo come parametri: num_words che rappresenta l'array contenete le parole per ogni processore, tot_words che rappresente il totale delle parole distribuite tra i diversi file considerati e num_proc che rappresenta il numero di processori che elaboreranno i file.
+```c
+void numWordForProcess(int *num_words, long tot_words, int num_proc)
+{
+    int module = (tot_words % num_proc);
+
+    if (module == 0)
+    {
+        for (int i = 0; i < num_proc; i++)
+        {
+            num_words[i] = tot_words / num_proc;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < num_proc; i++)
+        {
+            num_words[i] = tot_words / num_proc;
+        }
+        int end_module = 0;
+        while (module != 0)
+        {
+            int module2 = end_module % num_proc;
+            num_words[module2] = num_words[module2] + 1;
+            module--;
+            end_module--;
+        }
+    }
+}
+```
+
+
+Sulla seconda funzione ci soffermeremo un secondo in quanto risulta essere fondamentale per gli obiettivi del Word Count. Tale funzione prende in input la struttura vuota 'StructWordForProcess', il numero di processori utilizzato, l'array riempito con la funzione precedente contente il numero di parole per l'n-esimo processore e la struttura 'specFile' che è stata settata nella fase di analisi attraverso il conteggio totale delle parole presenti in tutti i file. Inizialmente controlliamo se le parole 
+```c
+int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *wordsForProcess, int num_proc, int *num_words, File *File)
+{
+    int my_rank = 0;
+    int element_in_struct = 0;
+    int file = 0;
+
+    int start = 0;
+
+    while (my_rank < num_proc)
+    {
+        wordsForProcess[element_in_struct].rank = my_rank;
+        wordsForProcess[element_in_struct].start = start;
+
+        int dif = num_words[my_rank] - (File[file].tot_words - start);
+        if (dif >= 0)
+        {
+            num_words[my_rank] = num_words[my_rank] - File[file].tot_words + start;
+            wordsForProcess[element_in_struct].end = File[file].tot_words - 1;
+            strcpy(wordsForProcess[element_in_struct].name_file, File[file].name_file);
+            start = 0;
+            element_in_struct++;
+            file++;
+            if (num_words[my_rank] == 0)
+            {
+                my_rank++;
+            }
+        }
+        else
+        {
+            wordsForProcess[element_in_struct].end = num_words[my_rank] + start - 1;
+            start = wordsForProcess[element_in_struct].end + 1;
+            num_words[my_rank] = 0;
+            strcpy(wordsForProcess[element_in_struct].name_file, File[file].name_file);
+            my_rank++;
+            element_in_struct++;
+        }
+    }
+    return element_in_struct;
+}
+
+```
