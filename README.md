@@ -132,7 +132,14 @@ void numWordForProcess(int *num_words, long tot_words, int num_proc)
 ```
 
 
-Sulla seconda funzione ci soffermeremo un secondo in quanto risulta essere fondamentale per gli obiettivi del Word Count. Tale funzione prende in input la struttura vuota 'StructWordForProcess', il numero di processori utilizzato, l'array riempito con la funzione precedente contente il numero di parole per l'n-esimo processore e la struttura 'specFile' che è stata settata nella fase di analisi attraverso il conteggio totale delle parole presenti in tutti i file. Inizialmente controlliamo se le parole 
+Sulla seconda funzione ci soffermeremo un secondo in quanto risulta essere fondamentale per gli obiettivi del Word Count. Tale funzione prende in input la struttura vuota 'StructWordForProcess', il numero di processori utilizzato, l'array riempito con la funzione precedente contente il numero di parole per l'n-esimo processore e la struttura 'specFile' che è stata settata nella fase di analisi attraverso il conteggio totale delle parole presenti in tutti i file. Inizialmente controlliamo se le parole contenute nell'array, relative all'n-esimo  processoere, siano maggiori di 0 una volta sottratte a queste il numero di parole contenute nel file (da cui sottraiamo altre parole 'start' che potrebbero essere state già assegnate a qualcun altro). Se tale differenza risulta essere positiva, sottraiamo dall'array le parole del file aggiungendo a queste le parole indicate da 'start' (consideriamo il caso in cui il processode debba leggere dalla metà del file) e rempiamo i campi della struttura. Fatto ciò incrementiamo:
+1. **il numero di elmenti presenti nella struct;
+2. **il numero di file (passiamo al file successivo,in quanto terminate le parole disponibili da questo);
+3. **ed verifichiamo che l'e-nesimo processore possa analizzare altre parole;
+
+Diversamente, se tale differenza risulta essere negativa significa che il file non riesce ad analizzare le restati parole dell'n-esimo file. Impostiamo per quel determinato elemento nella struct la variabile end (che indicherà le parole che il file riesce ad analizzare), impostiamo la variabile start ad una parola dopo l'end dell'elemento precedente e settiamo a zero il numero di parole che il processo precedente poteva analizzare (in quanto esaurite). Successivamente incrementiamo il numero di elmenti nella struttura e il vaolore 'my_rank' che indica il processore che effettuerà l'elaborazione.
+
+Il metodo ritorna il numero di split che sono stati effettuati tra il numero di parole e i diversi file.
 ```c
 int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *wordsForProcess, int num_proc, int *num_words, File *File)
 {
