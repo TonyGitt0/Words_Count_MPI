@@ -13,6 +13,9 @@ ID Project 01312 % 5 == 2
 	* [Esecuzione Locale](#esecuzione-locale)
 	* [Esecuzione sul Cluster](#esecuzione-sul-cluster)
 * [Descrizione della Soluzione](#descrizione-della-soluzione)
+	* [File Analysis](#file-analysis)
+	* [File Processing](#file-processing)
+	* [Test](#test)
 
 
 ## Introduzione
@@ -99,9 +102,12 @@ Inizialmente, prima che il processo di Word Count abbia inizio, abbiamo bisogno 
     MPI_Type_create_struct(n_items_ss, blocklengths_ss, offsets_ss, types_ss, &d_words);
     MPI_Type_commit(&d_words);
 ```
+
+## File Analysis
 Una volta create queste due strutture il nodo MASTER inizia la fase di ANALYSIS sui relativi file .txt. Tale analisi comprende il controllo dell'inserimento su riga di comando del numero di file da voler analizzare e mostra la lista dei file presi in considerazione ed il numero di parole totali che compongono questi. 
 
 
+## File Processing
 La fase di ANALYSIS è seguita dalla fase di PROCECSSING dei file. Durante la fase di PROCECSSING attraverso la funzione `numWordsForProcess` indichiamo il numero di parole che saranno destinate al n-esimo processore, mentre, con la funzione `setStructureWordForProcessForSplitFileForProcess` rempiamo la struttura `StructWordForProcess`.
 
 
@@ -188,3 +194,5 @@ int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *words
 
 ```
 L'atto finale della fase di PROCECSSING consente di mostrare a video come le parole dei diversi file verranno suddivise tra gli n processori. L'ultima fase è la fase di TEST.
+
+## Test
