@@ -52,10 +52,11 @@ Sostituisci:
 > **Assunzioni**: la seguente implementazione considera l'utilizzo di 24 file di testo composti da 99 parole ripetute per un totale di 50,171 per singolo file. In totale quindi avremo 1.204.104 parole da analizzare. Tali file sono stati autogenerati da uno script Python, dove ogni parola è seguita da uno spazio (compresa l'ultima parola). Il nodo MASTER parteciperà con gli SLAVE alla computazione.
 
 Inizialmente, prima che il processo di Word Count abbia inizio, abbiamo bisogno di inizializzare due strutture importanti: `dt_recived` e `d_words`. La prima struttura viene utilizzata per inviare dal MASTER i dati relativi al file che dovrà leggere un determinato SLAVE. I dati che verranno inseriti in tale struttura sono i seguenti:
-1. **il nome file, indica il nome del file analizzato;
-3. **il rank, indica il processore a cui sarà assegnata l'analisi del file considerato;
-5. **il punto di start, indica l'inizio da cui il processore dovrà analizzare il file considerato;
-6. **il punto di end, indica la fine in cui il processore terminerà di analizzare il file considerato;
+1. **il nome file**, indica il nome del file analizzato;
+3. **il rank**, indica il processore a cui sarà assegnata l'analisi del file considerato;
+5. **il punto di start**, indica l'inizio da cui il processore dovrà analizzare il file considerato;
+6. **il punto di end**, indica la fine in cui il processore terminerà di analizzare il file considerato;
+La seconda struttura `d_words`, invece, viene utilizzata per inviare dagli SLAVE al MASTER i dati relativi all'analisi effettuata sui file. Infatti la struttura prende in considerazione la parola e quante volte quest'ultima viene riscontrata nei diversi file.
 
 ```c
     // FIRST STRUCT
@@ -104,12 +105,29 @@ Inizialmente, prima che il processo di Word Count abbia inizio, abbiamo bisogno 
 ```
 
 ## File Analysis
-Una volta create queste due strutture il nodo MASTER inizia la fase di ANALYSIS sui relativi file .txt. Tale analisi comprende il controllo dell'inserimento su riga di comando del numero di file da voler analizzare e mostra la lista dei file presi in considerazione ed il numero di parole totali che compongono questi. 
+Una volta create queste due strutture il nodo MASTER inizia la fase di ANALYSIS sui relativi file .txt. Tale analisi comprende il controllo dell'inserimento su riga di comando del numero di file da voler analizzare e mostra la lista dei file presi in considerazione ed il numero di parole totali che compongono questi. Attraverso la funzione `sumAllWordsInDifferentFile` riusciamo a calcolare il numero totale di parole contenute nei diversi file e contemporaneamente popoliamo la struttura `File`.
+Possiamo vedere come a tale funzione passaimo un'array contenente la lista dei file presenti nella medesima directory, la struttura `File` e il numero di files che l'utente ha selezionato. La funzione si limita a stampare i file presi per eseguire Word Count e configura la struttura in considerazione introducendo in questa il nome del file e il numero di parole contenute da questo.
+
+```c
+int sumAllWordsInDifferentFile(char **list_files, File *singleFile, size_t *elem)
+{
+    int sum_all_words = 0, file = 0;
+    char **local_list_file = list_files;
+    for (int i = 0; i < *elem; i++)
+    {
+        printf("name file add to struct: %s\n", local_list_file[i]);
+        strcpy(singleFile[file].name_file, local_list_file[i]);
+        singleFile[file].tot_words = numWordInFile(local_list_file[i]);
+        sum_all_words = sum_all_words + singleFile[file].tot_words;
+        file++;
+    }
+    return sum_all_words;
+}
+```
 
 
 ## File Processing
-La fase di ANALYSIS è seguita dalla fase di PROCECSSING dei file. Durante la fase di PROCECSSING attraverso la funzione `numWordsForProcess` indichiamo il numero di parole che saranno destinate al n-esimo processore, mentre, con la funzione `setStructureWordForProcessForSplitFileForProcess` rempiamo la struttura `StructWordForProcess`.
-
+La fase di ANALYSIS è seguita dalla fase di PROCECSSING dei file. Durante la fase di PROCECSSING attraverso la funzione `numWordsForProcess` stimiamo il numero di parole che saranno destinate al n-esimo processore, mentre, con la funzione `setStructureWordForProcessForSplitFileForProcess` rempiamo la struttura `StructWordForProcess`.
 
 Nella funzione `numWordsForProcess` passeremo come parametri: num_words che rappresenta l'array contenete le parole per ogni processore, tot_words che rappresente il totale delle parole distribuite tra i diversi file considerati e num_proc che rappresenta il numero di processori che elaboreranno i file.
 ```c
@@ -144,9 +162,9 @@ void numWordForProcess(int *num_words, long tot_words, int num_proc)
 
 
 Sulla seconda funzione ci soffermeremo un secondo in quanto risulta essere fondamentale per gli obiettivi del Word Count. Tale funzione prende in input la struttura vuota `StructWordForProcess`, il numero di processori utilizzato, l'array riempito con la funzione precedente contente il numero di parole per l'n-esimo processore e la struttura `specFile` che è stata settata nella fase di analisi attraverso il conteggio totale delle parole presenti in tutti i file. Inizialmente controlliamo se le parole contenute nell'array, relative all'n-esimo  processore, non siano minori di 0 una volta sottratte a queste il numero di parole contenute nel file (da cui sottraiamo altre parole `start` che potrebbero essere state già assegnate a qualcun altro). Se tale differenza risulta essere positiva, sottraiamo dall'array le parole del file aggiungendo a queste le parole indicate da `start` (consideriamo il caso in cui il processor debba leggere dalla metà del file) e rempiamo i campi della struttura. Fatto ciò incrementiamo:
-1. **il numero di elmenti presenti nella struct;
-2. **il numero di file (passiamo al file successivo,in quanto terminate le parole disponibili da questo);
-3. **e verifichiamo che l'e-nesimo processore possa analizzare altre parole;
+1. **il numero di elmenti presenti nella struct**;
+2. **il numero di file (passiamo al file successivo,in quanto terminate le parole disponibili da questo)**;
+3. **e verifichiamo che l'e-nesimo processore possa analizzare altre parole**;
 
 Diversamente, se tale differenza risulta essere negativa significa che il file non riesce ad analizzare, per motivi di capienza, le restati parole dell'n-esimo file. Impostiamo per quel determinato elemento nella struct la variabile `end` (che indicherà le parole che il file riesce ad analizzare), impostiamo la variabile `start` ad una parola dopo `l'end` dell'elemento precedente e settiamo a zero il numero di parole che il processo precedente può analizzare (in quanto esaurite). Successivamente incrementiamo il numero di elmenti nella struttura e il vaolore `my_rank` che indica il processore che effettuerà l'elaborazione.
 
