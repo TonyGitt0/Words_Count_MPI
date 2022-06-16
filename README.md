@@ -16,7 +16,11 @@ ID Project 01312 % 5 == 2
 	* [File Analysis](#file-analysis)
 	* [File Processing](#file-processing)
 	* [Test](#test)
-
+* [Correttezza](#correttezza)
+* [Benchmarks](#benchmarks)
+	* [Weak Scalability](#weak-scalability)
+	* [Strong Scalability](#strong-scalability)
+* [Analisi dei risultati](#analisi-dei-risultati)
 
 ## Introduzione
 **The Word Count**, consente di contare il numero di parole in un documento o testo. Il conteggio delle parole può essere necessario quando un testo deve contenere un numero specifico di parole. Questo caso è prevalentemente presente nel mondo accademico, nei procedimenti legali, nel giornalismo e nella pubblicità. 
@@ -104,7 +108,7 @@ La seconda struttura `d_words`, invece, viene utilizzata per inviare dagli SLAVE
     MPI_Type_commit(&d_words);
 ```
 
-## File Analysis
+### File Analysis
 Una volta create queste due strutture il nodo MASTER inizia la fase di ANALYSIS sui relativi file .txt. Tale analisi comprende il controllo dell'inserimento su riga di comando del numero di file da voler analizzare e mostra la lista dei file presi in considerazione ed il numero di parole totali che compongono questi. Attraverso la funzione `sumAllWordsInDifferentFile` riusciamo a calcolare il numero totale di parole contenute nei diversi file e contemporaneamente popoliamo la struttura `File`.
 Possiamo vedere come a tale funzione passaimo un'array contenente la lista dei file presenti nella medesima directory, la struttura `File` e il numero di files che l'utente ha selezionato. La funzione si limita a stampare i file presi per eseguire Word Count e configura la struttura in considerazione introducendo in questa il nome del file e il numero di parole contenute da questo.
 
@@ -126,7 +130,7 @@ int sumAllWordsInDifferentFile(char **list_files, File *singleFile, size_t *elem
 ```
 
 
-## File Processing
+### File Processing
 La fase di ANALYSIS è seguita dalla fase di PROCECSSING dei file. Durante la fase di PROCECSSING attraverso la funzione `numWordsForProcess` stimiamo il numero di parole che saranno destinate al n-esimo processore, mentre, con la funzione `setStructureWordForProcessForSplitFileForProcess` rempiamo la struttura `StructWordForProcess`.
 
 Nella funzione `numWordsForProcess` passeremo come parametri: num_words che rappresenta l'array contenete le parole per ogni processore, tot_words che rappresente il totale delle parole distribuite tra i diversi file considerati e num_proc che rappresenta il numero di processori che elaboreranno i file.
@@ -213,7 +217,7 @@ int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *words
 ```
 L'atto finale della fase di PROCECSSING consente di mostrare a video come le parole dei diversi file verranno suddivise tra gli n processori. L'ultima fase è la fase di TEST.
 
-## Test
+### Test
 Nella fase di Test il programma Word Count inizia la sua vera e propria elaborazione. Nel nodo MASTER ritagliamo una porzione di programma in cui ritagliamo, per il nodo MASTER, alcuni elementi che fanno parte della struct `StructWordForProcess` (composta da name_file,rank,end,start). Fatto ciò inviamo le porzioni ritagliate per gli altri n-processi ai medesimi. La funzione che useremo per contare il numero di parole presenti in un file è la `wordCount`. Tale funzione verrà utilizzata indipendetemente dal processo MASTER, il quale aspetterà che anche gli altri nodi SLAVE eseguano tale funzione per poi aggiornare il numero totale delle parole (no-occorrenze) raggiungendo l'obiettivo finale.
 
 ```c
@@ -295,3 +299,8 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
     return new_word_vector;
 }
 ```
+
+## Correttezza
+### Strong Scalability
+### Weak Scalability
+## Analisi dei Risultati
