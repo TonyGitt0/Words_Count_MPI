@@ -214,3 +214,84 @@ int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *words
 L'atto finale della fase di PROCECSSING consente di mostrare a video come le parole dei diversi file verranno suddivise tra gli n processori. L'ultima fase è la fase di TEST.
 
 ## Test
+Nella fase di Test il programma Word Count inizia la sua vera e propria elaborazione. Nel nodo MASTER ritagliamo una porzione di programma in cui ritagliamo, per il nodo MASTER, alcuni elementi che fanno parte della struct `StructWordForProcess` (composta da name_file,rank,end,start). Fatto ciò inviamo le porzioni ritagliate per gli altri n-processi ai medesimi. La funzione che useremo per contare il numero di parole presenti in un file è la `wordCount`. Tale funzione verrà utilizzata indipendetemente dal processo MASTER, il quale aspetterà che anche gli altri nodi SLAVE eseguano tale funzione per poi aggiornare il numero totale delle parole (no-occorrenze) raggiungendo l'obiettivo finale.
+
+```c
+	while (wordForProcessor[index_struct].rank == 0 && index_struct < numSplit)
+        {
+            index_struct++;
+            startForZero++;
+        }
+
+        for (int rank = 1; rank < size; rank++)
+        {
+            int space = 0;
+            int index_struct_for_process = index_struct;
+            while (wordForProcessor[index_struct].rank == rank)
+            {
+                index_struct++;
+                space++;
+            }
+            MPI_Send(&wordForProcessor[index_struct_for_process], space, dt_received, rank, tag, MPI_COMM_WORLD);
+        }
+        total_new_words = wordCount(dictionary, wordForProcessor, startForZero,num_file,size);
+```
+
+La porzione di struttura dedicata al nodo MASTER la calcoliamo nel primo `while`. Invece le porzione da spedire agli altri processi vengono calcolate del `for` successivo, dove la `index_struc` indica la cella successiva al processo precedente dedicata al processo successivo. Fatto ciò inviamo le porzioni di struttura agli SLAVE ed effettuaimo il conteggio delle parole tramite la funzione `wordCount` per il MASTER. La funzione considera una prima struttura `WordFreq` che inizialmente sarà vuota, la struttura `StructWordForProcess` e una variabile `count` che servirà per accedere alla stuttura stessa. 
+Nel `while` leggiamo riga per riga il file per poi scomporre la riga in tante righe contenenti una singola parola [`char *p = strtok(allWords, " ")` ]. Fatto ciò controlliamo se la parola considerata risulta essere una parola di cui abbiamo trovato già in precedenza un occorrenza oppure no. Se la parola conta già un occorrenza passata il metodo `isWordNew` ritorna un valore positivo, tale valore rappresenta la posizione della parola all'interno del nostro **dizionario**. Il controllo ritorna un valore negativo nel momento in cui la parola analizzata non conta occorrenze passate, con cio tale parola viene inserita nel **dizionario**.
+
+
+> **Assunzioni**: la funzione sottostante ritorna il numero di nuove parole (no-occorrenza) trovate nel file. 
+> **Esempio**: "sasso, carta, sasso" ---> 2 (sasso,carta) 
+
+```c
+int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count, int num_proc)
+{
+    int line = 0;
+    int index_word = 0;
+    int new_word_vector = 0;
+    int lineToCompare = 0;
+    int line_end;
+
+    for (int i = 0; i < count; i++)
+    {
+        FILE *fPointer = fopen(structWord[i].name_file, "r");
+        char allWords[LENGHTLINE];
+
+        if (fPointer == NULL)
+        {
+            printf("FILE ERROR\n");
+            return -1;
+        }
+
+        while ((fgets(allWords, sizeof(allWords), fPointer)) != NULL)
+        {
+            line++;
+            if (line >= structWord[i].start && line <= structWord[i].end)
+            {
+                lineToCompare = (structWord[i].end - structWord[i].start);
+                strtok(allWords, "\n");
+                char *p = strtok(allWords, " ");
+                while (p != NULL)
+                {
+                    
+                    if ((index_word = isWordNew(dictionary, p, lineToCompare, num_proc)) == -3)
+                    {
+                        strcpy(dictionary[new_word_vector].word, p);
+                        dictionary[new_word_vector].word_occurency = 1;
+                        new_word_vector++;
+                    }
+                    else
+                    {
+                        dictionary[index_word].word_occurency++;
+                    }
+                    p = strtok(NULL, " ");
+                }
+            }
+        }
+        line = 0;
+        fclose(fPointer);
+    }
+    return new_word_vector;
+}
+```
