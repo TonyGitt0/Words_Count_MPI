@@ -301,6 +301,7 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
 ```
 
 ## Correttezza
+## Benchmarks
 ### Strong Scalability
 ### Weak Scalability
 ## Analisi dei Risultati
