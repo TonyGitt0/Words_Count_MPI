@@ -299,7 +299,7 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
     return new_word_vector;
 }
 ```
-
+Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER in modo tale che quest'ultimo riceva i risultati dei primi e vada ad eseguire la funzione `concatWordCount` che prende in considerazione il **dizionario** attuale visto dal MASTER e la struttura inviata a questo dagli SLAVE `words_to_master`. Prese in considerazione queste due strutture la funzione controlla se queste condividono una parola, se le strutture non codividono la parola allora questa viene aggiunta al **dizionario**.
 ## Correttezza
 ## Benchmarks
 ### Strong Scalability
