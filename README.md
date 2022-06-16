@@ -238,11 +238,11 @@ Nella fase di Test il programma Word Count inizia la sua vera e propria elaboraz
 ```
 
 La porzione di struttura dedicata al nodo MASTER la calcoliamo nel primo `while`. Invece le porzione da spedire agli altri processi vengono calcolate del `for` successivo, dove la `index_struc` indica la cella successiva al processo precedente dedicata al processo successivo. Fatto ciò inviamo le porzioni di struttura agli SLAVE ed effettuaimo il conteggio delle parole tramite la funzione `wordCount` per il MASTER. La funzione considera una prima struttura `WordFreq` che inizialmente sarà vuota, la struttura `StructWordForProcess` e una variabile `count` che servirà per accedere alla stuttura stessa. 
-Nel `while` leggiamo riga per riga il file per poi scomporre la riga in tante righe contenenti una singola parola [`char *p = strtok(allWords, " ")` ]. Fatto ciò controlliamo se la parola considerata risulta essere una parola di cui abbiamo trovato già in precedenza un occorrenza oppure no. Se la parola conta già un occorrenza passata il metodo `isWordNew` ritorna un valore positivo, tale valore rappresenta la posizione della parola all'interno del nostro **dizionario**. Il controllo ritorna un valore negativo nel momento in cui la parola analizzata non conta occorrenze passate, con cio tale parola viene inserita nel **dizionario**.
+Nel `while` leggiamo riga per riga (ogni riga contiene al massimo 300 caratteri) il file per poi scomporre la riga in tante righe contenenti una singola parola [`char *p = strtok(allWords, " ")` ]. Fatto ciò controlliamo se la parola considerata risulta essere una parola di cui abbiamo trovato già in precedenza un occorrenza oppure no. Se la parola conta già un occorrenza passata il metodo `isWordNew` ritorna un valore positivo, tale valore rappresenta la posizione della parola all'interno del nostro **dizionario**. Il controllo ritorna un valore negativo nel momento in cui la parola analizzata non conta occorrenze passate, con cio tale parola viene inserita nel **dizionario**.
 
 
 > **Assunzioni**: la funzione sottostante ritorna il numero di nuove parole (no-occorrenza) trovate nel file. 
-> **Esempio**: "sasso, carta, sasso" ---> 2 (sasso,carta) 
+> **Esempio**: "sasso, carta, sasso" ---> 2: (sasso,carta) 
 
 ```c
 int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count, int num_proc)
