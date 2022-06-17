@@ -13,7 +13,14 @@ ID Project 01312 % 5 == 2
 	* [Esecuzione Locale](#esecuzione-locale)
 	* [Esecuzione sul Cluster](#esecuzione-sul-cluster)
 * [Descrizione della Soluzione](#descrizione-della-soluzione)
-
+	* [File Analysis](#file-analysis)
+	* [File Processing](#file-processing)
+	* [Test](#test)
+* [Correttezza](#correttezza)
+* [Benchmarks](#benchmarks)
+	* [Weak Scalability](#weak-scalability)
+	* [Strong Scalability](#strong-scalability)
+* [Analisi dei risultati](#analisi-dei-risultati)
 
 ## Introduzione
 **The Word Count**, consente di contare il numero di parole in un documento o testo. Il conteggio delle parole può essere necessario quando un testo deve contenere un numero specifico di parole. Questo caso è prevalentemente presente nel mondo accademico, nei procedimenti legali, nel giornalismo e nella pubblicità. 
@@ -48,7 +55,13 @@ Sostituisci:
 ## Descrizione della Soluzione
 > **Assunzioni**: la seguente implementazione considera l'utilizzo di 24 file di testo composti da 99 parole ripetute per un totale di 50,171 per singolo file. In totale quindi avremo 1.204.104 parole da analizzare. Tali file sono stati autogenerati da uno script Python, dove ogni parola è seguita da uno spazio (compresa l'ultima parola). Il nodo MASTER parteciperà con gli SLAVE alla computazione.
 
-Inizialmente, prima che il processo di Word Count abbia inizio, abbiamo bisogno di inizializzare due strutture importanti: 'dt_recived' e 'd_words'. La prima struttura viene utilizzata per inviare dal MASTER i dati relativi al file che dovrà leggere un determinato SLAVE. I dati che verranno inseriti in tale struttura sono i seguenti: nome file, rank, start ed end. Il nome file indica il nome del file analizzato, i rank rappresentano i processori utilizzati tra i quali si effettuerà la suddivisione dei file, start indica l'inizio del file da cui un processore deve iniziare la sua computazione, end indica la fine del filein cui un processore deve terminare la sua computazione.
+Inizialmente, prima che il processo di Word Count abbia inizio, abbiamo bisogno di inizializzare due strutture importanti: `dt_recived` e `d_words`. La prima struttura viene utilizzata per inviare dal MASTER i dati relativi al file che dovrà leggere un determinato SLAVE. I dati che verranno inseriti in tale struttura sono i seguenti:
+1. **il nome file**, indica il nome del file analizzato;
+3. **il rank**, indica il processore a cui sarà assegnata l'analisi del file considerato;
+5. **il punto di start**, indica l'inizio da cui il processore dovrà analizzare il file considerato;
+6. **il punto di end**, indica la fine in cui il processore terminerà di analizzare il file considerato;
+La seconda struttura `d_words`, invece, viene utilizzata per inviare dagli SLAVE al MASTER i dati relativi all'analisi effettuata sui file. Infatti la struttura prende in considerazione la parola e quante volte quest'ultima viene riscontrata nei diversi file.
+
 ```c
     // FIRST STRUCT
     const int n_items_fs = 4;        
@@ -94,13 +107,33 @@ Inizialmente, prima che il processo di Word Count abbia inizio, abbiamo bisogno 
     MPI_Type_create_struct(n_items_ss, blocklengths_ss, offsets_ss, types_ss, &d_words);
     MPI_Type_commit(&d_words);
 ```
-Una volta create queste due strutture il nodo MASTER inizia la fase di analisi sui relativi file .txt. Tale analisi comprende il controllo dell'inserimento su riga di comando del numero di file da voler analizzare e mostra la lista dei file presi in considerazione ed il numero di parole totali che compongono questi. 
+
+### File Analysis
+Una volta create queste due strutture il nodo MASTER inizia la fase di ANALYSIS sui relativi file .txt. Tale analisi comprende il controllo dell'inserimento su riga di comando del numero di file da voler analizzare e mostra la lista dei file presi in considerazione ed il numero di parole totali che compongono questi. Attraverso la funzione `sumAllWordsInDifferentFile` riusciamo a calcolare il numero totale di parole contenute nei diversi file e contemporaneamente popoliamo la struttura `File`.
+Possiamo vedere come a tale funzione passaimo un'array contenente la lista dei file presenti nella medesima directory, la struttura `File` e il numero di files che l'utente ha selezionato. La funzione si limita a stampare i file presi per eseguire Word Count e configura la struttura in considerazione introducendo in questa il nome del file e il numero di parole contenute da questo.
+
+```c
+int sumAllWordsInDifferentFile(char **list_files, File *singleFile, size_t *elem)
+{
+    int sum_all_words = 0, file = 0;
+    char **local_list_file = list_files;
+    for (int i = 0; i < *elem; i++)
+    {
+        printf("name file add to struct: %s\n", local_list_file[i]);
+        strcpy(singleFile[file].name_file, local_list_file[i]);
+        singleFile[file].tot_words = numWordInFile(local_list_file[i]);
+        sum_all_words = sum_all_words + singleFile[file].tot_words;
+        file++;
+    }
+    return sum_all_words;
+}
+```
 
 
-La fase di Analisi è seguita dalla fase di processamento dei file. Durante la fase di processamento dei file attraverso la funzione 'numWordsForProcess' indichiamo il numero di parole che saranno destinate al n-esimo processore, mentre, con la funzione 'setStructureWordForProcessForSplitFileForProcess' rempiamo la struttura 'StructWordForProcess'.
+### File Processing
+La fase di ANALYSIS è seguita dalla fase di PROCECSSING dei file. Durante la fase di PROCECSSING attraverso la funzione `numWordsForProcess` stimiamo il numero di parole che saranno destinate al n-esimo processore, mentre, con la funzione `setStructureWordForProcessForSplitFileForProcess` rempiamo la struttura `StructWordForProcess`.
 
-
-Nella funzione 'numWordsForProcess' passeremo come parametri: num_words che rappresenta l'array contenete le parole per ogni processore, tot_words che rappresente il totale delle parole distribuite tra i diversi file considerati e num_proc che rappresenta il numero di processori che elaboreranno i file.
+Nella funzione `numWordsForProcess` passeremo come parametri: num_words che rappresenta l'array contenete le parole per ogni processore, tot_words che rappresente il totale delle parole distribuite tra i diversi file considerati e num_proc che rappresenta il numero di processori che elaboreranno i file.
 ```c
 void numWordForProcess(int *num_words, long tot_words, int num_proc)
 {
@@ -132,7 +165,14 @@ void numWordForProcess(int *num_words, long tot_words, int num_proc)
 ```
 
 
-Sulla seconda funzione ci soffermeremo un secondo in quanto risulta essere fondamentale per gli obiettivi del Word Count. Tale funzione prende in input la struttura vuota 'StructWordForProcess', il numero di processori utilizzato, l'array riempito con la funzione precedente contente il numero di parole per l'n-esimo processore e la struttura 'specFile' che è stata settata nella fase di analisi attraverso il conteggio totale delle parole presenti in tutti i file. Inizialmente controlliamo se le parole 
+Sulla seconda funzione ci soffermeremo un secondo in quanto risulta essere fondamentale per gli obiettivi del Word Count. Tale funzione prende in input la struttura vuota `StructWordForProcess`, il numero di processori utilizzato, l'array riempito con la funzione precedente contente il numero di parole per l'n-esimo processore e la struttura `specFile` che è stata settata nella fase di analisi attraverso il conteggio totale delle parole presenti in tutti i file. Inizialmente controlliamo se le parole contenute nell'array, relative all'n-esimo  processore, non siano minori di 0 una volta sottratte a queste il numero di parole contenute nel file (da cui sottraiamo altre parole `start` che potrebbero essere state già assegnate a qualcun altro). Se tale differenza risulta essere positiva, sottraiamo dall'array le parole del file aggiungendo a queste le parole indicate da `start` (consideriamo il caso in cui il processor debba leggere dalla metà del file) e rempiamo i campi della struttura. Fatto ciò incrementiamo:
+1. **il numero di elmenti presenti nella struct**;
+2. **il numero di file (passiamo al file successivo,in quanto terminate le parole disponibili da questo)**;
+3. **e verifichiamo che l'e-nesimo processore possa analizzare altre parole**;
+
+Diversamente, se tale differenza risulta essere negativa significa che il file non riesce ad analizzare, per motivi di capienza, le restati parole dell'n-esimo file. Impostiamo per quel determinato elemento nella struct la variabile `end` (che indicherà le parole che il file riesce ad analizzare), impostiamo la variabile `start` ad una parola dopo `l'end` dell'elemento precedente e settiamo a zero il numero di parole che il processo precedente può analizzare (in quanto esaurite). Successivamente incrementiamo il numero di elmenti nella struttura e il vaolore `my_rank` che indica il processore che effettuerà l'elaborazione.
+
+Il metodo ritorna il numero di split che sono stati effettuati tra il numero di parole dei diversi file e i processori.
 ```c
 int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *wordsForProcess, int num_proc, int *num_words, File *File)
 {
@@ -175,3 +215,96 @@ int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *words
 }
 
 ```
+L'atto finale della fase di PROCECSSING consente di mostrare a video come le parole dei diversi file verranno suddivise tra gli n processori. L'ultima fase è la fase di TEST.
+
+### Test
+Nella fase di Test il programma Word Count inizia la sua vera e propria elaborazione. Nel nodo MASTER ritagliamo una porzione di programma in cui ritagliamo, per il nodo MASTER, alcuni elementi che fanno parte della struct `StructWordForProcess` (composta da name_file,rank,end,start). Fatto ciò inviamo le porzioni ritagliate per gli altri n-processi ai medesimi. La funzione che useremo per contare il numero di parole presenti in un file è la `wordCount`. Tale funzione verrà utilizzata indipendetemente dal processo MASTER, il quale aspetterà che anche gli altri nodi SLAVE eseguano tale funzione per poi aggiornare il numero totale delle parole (no-occorrenze) raggiungendo l'obiettivo finale.
+
+```c
+	while (wordForProcessor[index_struct].rank == 0 && index_struct < numSplit)
+        {
+            index_struct++;
+            startForZero++;
+        }
+
+        for (int rank = 1; rank < size; rank++)
+        {
+            int space = 0;
+            int index_struct_for_process = index_struct;
+            while (wordForProcessor[index_struct].rank == rank)
+            {
+                index_struct++;
+                space++;
+            }
+            MPI_Send(&wordForProcessor[index_struct_for_process], space, dt_received, rank, tag, MPI_COMM_WORLD);
+        }
+        total_new_words = wordCount(dictionary, wordForProcessor, startForZero,num_file,size);
+```
+
+La porzione di struttura dedicata al nodo MASTER la calcoliamo nel primo `while`. Invece le porzione da spedire agli altri processi vengono calcolate del `for` successivo, dove la `index_struc` indica la cella successiva al processo precedente dedicata al processo successivo. Fatto ciò inviamo le porzioni di struttura agli SLAVE ed effettuaimo il conteggio delle parole tramite la funzione `wordCount` per il MASTER. La funzione considera una prima struttura `WordFreq` che inizialmente sarà vuota, la struttura `StructWordForProcess` e una variabile `count` che servirà per accedere alla stuttura stessa. 
+Nel `while` leggiamo riga per riga (ogni riga contiene al massimo 300 caratteri) il file per poi scomporre la riga in tante righe contenenti una singola parola [`char *p = strtok(allWords, " ")` ]. Fatto ciò controlliamo se la parola considerata risulta essere una parola di cui abbiamo trovato già in precedenza un occorrenza oppure no. Se la parola conta già un occorrenza passata il metodo `isWordNew` ritorna un valore positivo, tale valore rappresenta la posizione della parola all'interno del nostro **dizionario**. Il controllo ritorna un valore negativo nel momento in cui la parola analizzata non conta occorrenze passate, con cio tale parola viene inserita nel **dizionario**.
+
+
+> **Assunzioni**: la funzione sottostante ritorna il numero di nuove parole (no-occorrenza) trovate nel file. 
+> **Esempio**: "sasso, carta, sasso" ---> 2: (sasso,carta) 
+
+```c
+int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count, int num_proc)
+{
+    int line = 0;
+    int index_word = 0;
+    int new_word_vector = 0;
+    int lineToCompare = 0;
+    int line_end;
+
+    for (int i = 0; i < count; i++)
+    {
+        FILE *fPointer = fopen(structWord[i].name_file, "r");
+        char allWords[LENGHTLINE];
+
+        if (fPointer == NULL)
+        {
+            printf("FILE ERROR\n");
+            return -1;
+        }
+
+        while ((fgets(allWords, sizeof(allWords), fPointer)) != NULL)
+        {
+            line++;
+            if (line >= structWord[i].start && line <= structWord[i].end)
+            {
+                lineToCompare = (structWord[i].end - structWord[i].start);
+                strtok(allWords, "\n");
+                char *p = strtok(allWords, " ");
+                while (p != NULL)
+                {
+                    
+                    if ((index_word = isWordNew(dictionary, p, lineToCompare, num_proc)) == -3)
+                    {
+                        strcpy(dictionary[new_word_vector].word, p);
+                        dictionary[new_word_vector].word_occurency = 1;
+                        new_word_vector++;
+                    }
+                    else
+                    {
+                        dictionary[index_word].word_occurency++;
+                    }
+                    p = strtok(NULL, " ");
+                }
+            }
+        }
+        line = 0;
+        fclose(fPointer);
+    }
+    return new_word_vector;
+}
+```
+Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER in modo tale che quest'ultimo riceva i risultati dei primi e vada ad eseguire la funzione `concatWordCount` che prende in considerazione il **dizionario** attuale visto dal MASTER e la struttura inviata a questo dagli SLAVE `words_to_master`. Prese in considerazione queste due strutture la funzione controlla se queste condividono una parola, se le strutture non codividono la parola allora questa viene aggiunta al **dizionario**.
+
+## Benchmarks
+L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito possiamo visionare i risultati.
+### Strong Scalability
+
+### Weak Scalability
+
+## Analisi dei Risultati
