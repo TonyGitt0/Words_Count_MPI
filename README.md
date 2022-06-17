@@ -303,7 +303,9 @@ Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER
 
 ## Benchmarks
 L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito sono riportati i risultati:
+
 ### Strong Scalability
+L'algoritmo è stato eseguito su un insieme di file composto da 24 elementi contenenti ognuno 50,171 parole. Lo speed up viene calcolato dividendo il tempo di esecuzione percepito in modo sequenziale con il tempo di esecuzione con P processori.
 
 ### Weak Scalability
 
