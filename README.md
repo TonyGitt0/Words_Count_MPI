@@ -302,8 +302,10 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
 Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER in modo tale che quest'ultimo riceva i risultati dei primi e vada ad eseguire la funzione `concatWordCount` che prende in considerazione il **dizionario** attuale visto dal MASTER e la struttura inviata a questo dagli SLAVE `words_to_master`. Prese in considerazione queste due strutture la funzione controlla se queste condividono una parola, se le strutture non codividono la parola allora questa viene aggiunta al **dizionario**.
 
 ## Benchmarks
-L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito possiamo visionare i risultati.
+L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito sono riportati i risultati:
+
 ### Strong Scalability
+L'algoritmo è stato eseguito su un insieme di file composto da 24 elementi contenenti ognuno 50,171 parole. Lo speed up viene calcolato dividendo il tempo di esecuzione percepito in modo sequenziale con il tempo di esecuzione con P processori.
 
 ### Weak Scalability
 
