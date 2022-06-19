@@ -10,7 +10,7 @@
 #define NUM_FILES 2
 #define MAXWORDS 10000
 
-
+// TESTED
 int sumAllWordsInDifferentFile(char **list_files, File *singleFile, size_t *elem)
 {
     int sum_all_words = 0, file = 0;
@@ -26,13 +26,15 @@ int sumAllWordsInDifferentFile(char **list_files, File *singleFile, size_t *elem
     return sum_all_words;
 }
 
-
+// torna la lista dei miei file -- TESTED
+// da rivedere l'aggiunta di num_files che indica quanti file dei file totali che abbiamo nella
+// directory dobbiamo analizzare
 char **listOfFile(char *directory_path, size_t *elems, int num_files)
 {
     DIR *directory = opendir(directory_path);
     struct dirent *entity;
 
-    char **list_files = (char **)malloc(num_files * sizeof(char)); 
+    char **list_files = (char **)malloc(num_files * sizeof(char)); // NULL;(char **)malloc(NUM_FILES * sizeof(char));
     int i = 0;
 
     if (directory != NULL)
@@ -60,7 +62,7 @@ char **listOfFile(char *directory_path, size_t *elems, int num_files)
     return list_files;
 }
 
-
+// conta il numero di file in una directory -- TESTED
 int numFilesInDirectory(char *directory_path)
 {
     DIR *directory = opendir(directory_path);
@@ -92,7 +94,7 @@ int numFilesInDirectory(char *directory_path)
     return num_files;
 }
 
-
+// conta il numero di parole in un file -- TESTED
 int numWordInFile(char *name_file)
 {
     FILE *fPointer;
@@ -137,14 +139,15 @@ int numWordInFile(char *name_file)
     return word_count;
 }
 
-
+// TESTED
+// In this function include the use of MASTER
 int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *wordsForProcess, int num_proc, int *num_words, File *File)
 {
-    int my_rank = 0;
-    int element_in_struct = 0;
-    int file = 0;
+    int my_rank = 0; //processor
+    int element_in_struct = 0; //strutture
+    int file = 0; //file
 
-    int start = 0;
+    int start = 0; //offset
 
     while (my_rank < num_proc)
     {
@@ -178,7 +181,7 @@ int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *words
     return element_in_struct;
 }
 
-
+// TESTED
 void numWordForProcess(int *num_words, long tot_words, int num_proc)
 {
     int module = (tot_words % num_proc);
@@ -196,6 +199,9 @@ void numWordForProcess(int *num_words, long tot_words, int num_proc)
         {
             num_words[i] = tot_words / num_proc;
         }
+        // se il modulo risulta non essere congruo a zero andiamo ad assegnare ai primi
+        //  n (n = module) processi una dimensione in piu cosi da partizionare in maniera
+        // adeguata le parole
         int end_module = 0;
         while (module != 0)
         {
@@ -207,12 +213,18 @@ void numWordForProcess(int *num_words, long tot_words, int num_proc)
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////
 
 int isWordNew(WordFreq *dictionary, char *string, int new_words, int num_proc)
 {
     int i;
     if (num_proc == 1)
     {
+        // new_words + 1 perché altrimenti quando utilizziamo un solo processo l'ultima parola di ogni file non vine accoppiata
+        //per via del problema di dimensioni di new word == line to compare
+        // se abbiamo 8 righe l'ultima riga ritorna -3 quindi anche se ripetuta in piu file quella riga viene vista sempre come nuova parola
+        //quando usaimo piu procesi cio non accade perche abbiamo incluso nella concat il fatto 
+        //che accorpiamo tutte le parole con quelle esistenti 
         for (i = 0; i < new_words+1; i++)
         {
             if (strcmp(dictionary[i].word, string) == 0)
@@ -226,6 +238,8 @@ int isWordNew(WordFreq *dictionary, char *string, int new_words, int num_proc)
         if (strcmp(dictionary[i].word, string) == 0)
             return i;
     }
+    // ritorno - perche altrimenti se tornassi un numero n positivo il  la funzione quando analizza l'n parola mi ritorna un n
+    //  e impedisce il conteggio esatto
     return -3;
 }
 
@@ -267,7 +281,7 @@ char **split(char *allWords, const char *delim)
 }
 */
 
-int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count, int num_files, int num_proc)
+int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count, int num_proc)
 {
     int line = 0;
     int index_word = 0;
@@ -286,13 +300,17 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
             printf("FILE ERROR\n");
             return -1;
         }
-
+        //printf("SLAVE %d\n:",structWord[i].rank);
+        // leggiamo riga per riga il file
+        // consideriamo per ora che una riga può raggiunre le dimensioni di 300 caratteri
         while ((fgets(allWords, sizeof(allWords), fPointer)) != NULL)
         {
             // printf("%s",allWords);
             line++;
             if (line >= structWord[i].start && line <= structWord[i].end)
             {
+                //lineToCompare equivale ad una sola parola, quando leggiamo più file con un unico processo 
+                //abbiamo bisogno di size nella funzione word count
                 lineToCompare = (structWord[i].end - structWord[i].start);
                 //printf("single_word: %d\n", lineToCompare);
                 strtok(allWords, "\n");
@@ -305,13 +323,13 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
                         //printf("P INTERNO ----- %s\n",p);
                         strcpy(dictionary[new_word_vector].word, p);
                         dictionary[new_word_vector].word_occurency = 1;
-                        // printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[new_word_vector].word, dictionary[new_word_vector].word_occurency);
+                        //printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[new_word_vector].word, dictionary[new_word_vector].word_occurency);
                         new_word_vector++;
                     }
                     else
                     {
                         dictionary[index_word].word_occurency++;
-                        // printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[index_word].word, dictionary[index_word].word_occurency);
+                        //printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[index_word].word, dictionary[index_word].word_occurency);
                     }
                     p = strtok(NULL, " ");
                 }
@@ -320,6 +338,7 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
         line = 0;
         fclose(fPointer);
     }
+    // ritorniamo il numero di parole (trovate per la prima volta) nel file
     return new_word_vector;
 }
 
@@ -338,6 +357,9 @@ extern int concatWordCount(WordFreq *dictionary, WordFreq *received_words, int c
                 break;
             }
         }
+        // se j == new_words vuol dire che tra le due stutture c'è una parola che
+        // non è condivisa, ovvero non appartiene ad entrambe, quindi alla j-esima posizione della prima
+        // struttura inseriamo la nuova parola appartenente alla seconda struttura che non è in comune tra le due
         if (j == total_new_words)
         {
             strcpy(dictionary[j].word, received_words[i].word);
@@ -345,6 +367,7 @@ extern int concatWordCount(WordFreq *dictionary, WordFreq *received_words, int c
             total_new_words++;
         }
     }
+    // ritorniamo il numero di parole aggiunte all'inetero dizionario
     return total_new_words;
 }
 
@@ -354,7 +377,7 @@ void getDataOfWOrd(WordFreq *dictionary, int total_new_words)
     printf("\n");
     for (int n = 0; n < total_new_words; n++)
     {
-        printf("word:  %s , occurency: %d\n", dictionary[n].word, dictionary[n].word_occurency);
+        //printf("word:  %s , occurency: %d\n", dictionary[n].word, dictionary[n].word_occurency);
         check += dictionary[n].word_occurency;
     }
     printf("\n");

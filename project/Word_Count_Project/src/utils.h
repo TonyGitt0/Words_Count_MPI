@@ -12,7 +12,7 @@
 #define SINGLEWORD 20
 
 
-
+//STRUCTURE
 typedef struct {
     char name_file[LENGHTFILENAME];
     int rank;
@@ -31,7 +31,7 @@ typedef struct{
 }WordFreq;
 
 
-
+//TESTED METHOD
 extern int numFilesInDirectory(char *path);
 extern int numWordInFile(char *name_file);
 extern char **listOfFile(char *directory_path,size_t *elems,int num_file);
@@ -43,6 +43,6 @@ extern int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess
 extern int isWordNew(WordFreq* dictionary, char* string, int new_words,int num_proc);
 extern int whichWord(WordFreq** dictionary, char* string, int new_words);
 extern char **split (char *allWords, const char *delim);
-extern int wordCount(WordFreq* dictionary, StructWordForProcess* wordForProcessor,int count,int num_files,int num_proc);
+extern int wordCount(WordFreq* dictionary, StructWordForProcess* wordForProcessor,int count,int num_proc);
 extern int concatWordCount(WordFreq* dictionary,WordFreq* received_words,int count,int total_new_word);
 extern void getDataOfWOrd(WordFreq* dictionary,int total_new_words);
