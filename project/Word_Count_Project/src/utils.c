@@ -7,7 +7,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "utils.h"
-#define NUM_FILES 2
 #define MAXWORDS 10000
 
 // TESTED
@@ -314,14 +313,14 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
                 lineToCompare = (structWord[i].end - structWord[i].start);
                 //printf("single_word: %d\n", lineToCompare);
                 strtok(allWords, "\n");
-                char *p = strtok(allWords, " ");
-                while (p != NULL)
-                {
+                //char *p = strtok(allWords, " ");
+                //while (p != NULL)
+                //{
                     
-                    if ((index_word = isWordNew(dictionary, p, lineToCompare, num_proc)) == -3)
+                    if ((index_word = isWordNew(dictionary, /*p*/ allWords, lineToCompare, num_proc)) == -3)
                     {
                         //printf("P INTERNO ----- %s\n",p);
-                        strcpy(dictionary[new_word_vector].word, p);
+                        strcpy(dictionary[new_word_vector].word, /*p*/ allWords);
                         dictionary[new_word_vector].word_occurency = 1;
                         //printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[new_word_vector].word, dictionary[new_word_vector].word_occurency);
                         new_word_vector++;
@@ -331,8 +330,8 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
                         dictionary[index_word].word_occurency++;
                         //printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[index_word].word, dictionary[index_word].word_occurency);
                     }
-                    p = strtok(NULL, " ");
-                }
+                   // p = strtok(NULL, " ");
+                //}
             }
         }
         line = 0;

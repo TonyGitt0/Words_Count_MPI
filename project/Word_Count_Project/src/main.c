@@ -6,8 +6,7 @@
 #include <mpi.h>
 
 #define TOTALWORDS 100000000
-#define MAX_SPLIT 1000
-#define NUM_FILES 2
+#define MAX_SPLIT 100000
 #define MASTER 0
 
 
@@ -177,6 +176,9 @@ int main(int argc, char *argv[])
 
         getDataOfWOrd(dictionary, total_new_words);
         printf("Total words (no-occurency) in all file is: %d\n", total_new_words);
+        double time_end = MPI_Wtime();
+        double time = time_end - time_start;
+        printf("Time: %lf\n\n", time);
 
     }
     else
@@ -188,20 +190,20 @@ int main(int argc, char *argv[])
 
        
         new_word_single_processor = wordCount(dictionary, wordForProcessor, count ,size);       
-        MPI_Send(dictionary, new_word_single_processor, d_words, 0, tag, MPI_COMM_WORLD);
+        MPI_Ssend(dictionary, new_word_single_processor, d_words, 0, tag, MPI_COMM_WORLD);
     }
 
     MPI_Type_free(&d_words);
     MPI_Type_free(&dt_received);
 
     // p = 5 file = 12 0.34/0.36
-    MPI_Barrier(MPI_COMM_WORLD);
+   /* MPI_Barrier(MPI_COMM_WORLD);
     if(myrank == 0)
     {
         double time_end = MPI_Wtime();
         double time = time_end - time_start;
         printf("Time: %lf\n\n", time);
-    }
+    } */
     MPI_Finalize();
     return 0;
 }
