@@ -304,20 +304,21 @@ Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER
 L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito sono riportati i risultati:
 
 ### Strong Scalability
-La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 72 Mb. 
+La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 115 Mb. 
 
 <table>
-<tr><th>Table 1 Heading 1 </th><th>Table 1 Heading 2</th></tr>
+<tr><th>Speed-up (1 file) </th><th>Speed-up (24-file)</th></tr>
 <tr><td>
 
-|Table 1| Middle | Table 2|
-|--|--|--|
-|a| not b|and c |
+| Numero di slave | Tempo di esecuzione in secondi | Speed-up |
+| :-------------: | :----------------------------: | :------: |
+| 1               | 40.463891			   | 1.00     |
+| 2 		  | 20.715699                      | 1.95     |
 
 </td><td>
 
-|b|1|2|3| 
-|--|--|--|--|
+| Numero di slave | Tempo di esecuzione in secondi | Speed-up |
+| :-------------: | :----------------------------: | :------: |
 |a|s|d|f|
 
 </td></tr> </table>
