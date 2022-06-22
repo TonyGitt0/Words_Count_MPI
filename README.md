@@ -16,7 +16,6 @@ ID Project 01312 % 5 == 2
 	* [File Analysis](#file-analysis)
 	* [File Processing](#file-processing)
 	* [Test](#test)
-* [Correttezza](#correttezza)
 * [Benchmarks](#benchmarks)
 	* [Weak Scalability](#weak-scalability)
 	* [Strong Scalability](#strong-scalability)
@@ -305,7 +304,34 @@ Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER
 L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito sono riportati i risultati:
 
 ### Strong Scalability
-L'algoritmo è stato eseguito su un insieme di file composto da 24 elementi contenenti ognuno 50,171 parole. Lo speed up viene calcolato dividendo il tempo di esecuzione percepito in modo sequenziale con il tempo di esecuzione con P processori.
+La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 72 Mb. 
+
+
+| Numero di slave | Tempo di esecuzione in secondi | Speed-up |               | Numero di slave | Tempo di esecuzione in secondi | Speed-up | 
+| :-------------: | :----------------------------: | :--------------------: | | :-------------: | :----------------------------: | :--------------------: |    
+| 1               | 15.869725                      | 112,37                 | | 1               | 15.869725                      | 112,37                 |
+| 2               | 20.955662                      | 224.74                 | | 2               | 20.955662                      | 224.74                 |
+| 3               | 25.055182                      | 337.11                 | | 2               | 20.955662                      | 224.74                 |
+| 4               | 25.395312                      | 449.48                 | | 2               | 20.955662                      | 224.74                 |
+| 5               | 24.543799                      | 561.85                 | | 2               | 20.955662                      | 224.74                 |
+| 6               | 26.670880                      | 674.22                 | | 2               | 20.955662                      | 224.74                 |
+| 7               | 26.915306                      | 786.59                 | | 2               | 20.955662                      | 224.74                 |
+| 8               | 26.716327                      | 898.96                 | | 2               | 20.955662                      | 224.74                 |
+| 9               | 26.589688                      | 1011.33                | | 2               | 20.955662                      | 224.74                 |
+| 10              | 26.551581                      | 1123.7                 | | 2               | 20.955662                      | 224.74                 |
+| 11              | 26.568343                      | 1236.07                | | 2               | 20.955662                      | 224.74                 |
+| 13              | 27.124493                      | 1348.44                | | 2               | 20.955662                      | 224.74                 |
+| 13              | 26.975850                      | 1460.81                | | 2               | 20.955662                      | 224.74                 |
+| 14              | 27.053065                      | 1573.18                | | 2               | 20.955662                      | 224.74                 |
+| 15              | 26.598351                      | 1685.55                | | 2               | 20.955662                      | 224.74                 |
+| 16              | 26.635424                      | 1797.92                | | 2               | 20.955662                      | 224.74                 |
+| 17              | 26.477229                      | 1910.29                | | 2               | 20.955662                      | 224.74                 |
+| 18              | 27.163188                      | 2022.66                | | 2               | 20.955662                      | 224.74                 |
+| 19              | 26.503225                      | 2135.03                | | 2               | 20.955662                      | 224.74                 |
+| 20              | 26.652417                      | 2247.4                 | | 2               | 20.955662                      | 224.74                 |
+| 21              | 26.390431                      | 2359.77                | | 2               | 20.955662                      | 224.74                 |
+| 22              | 26.490460                      | 2472.14                | | 2               | 20.955662                      | 224.74                 |        
+| 23              | 26.610655                      | 2584.51                | | 2               | 20.955662                      | 224.74                 |
 
 ### Weak Scalability
 
