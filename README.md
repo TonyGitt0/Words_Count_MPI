@@ -16,7 +16,6 @@ ID Project 01312 % 5 == 2
 	* [File Analysis](#file-analysis)
 	* [File Processing](#file-processing)
 	* [Test](#test)
-* [Correttezza](#correttezza)
 * [Benchmarks](#benchmarks)
 	* [Weak Scalability](#weak-scalability)
 	* [Strong Scalability](#strong-scalability)
@@ -305,7 +304,49 @@ Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER
 L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito sono riportati i risultati:
 
 ### Strong Scalability
-L'algoritmo è stato eseguito su un insieme di file composto da 24 elementi contenenti ognuno 50,171 parole. Lo speed up viene calcolato dividendo il tempo di esecuzione percepito in modo sequenziale con il tempo di esecuzione con P processori.
+La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 115 Mb. 
+
+<table>
+<tr><th>Speed-up (1 file) </th><th>Speed-up (24-file)</th></tr>
+<tr><td>
+
+| Numero di slave | Tempo di esecuzione in secondi | Speed-up |
+| :-------------: | :----------------------------: | :------: |
+| 1               | 40.463891			   | 1.00     |
+| 2 		  | 20.715699                      | 1.95     |
+| 3               | 29.023854                      | 1.39     |
+| 4               | 22.597001                      | 1.79     |
+| 5               | 20.738688                      | 1.95     |
+| 6               | 17.668001                      | 2.29     |
+| 7               | 15.370446                      | 2.63     |
+| 8               | 14.173882                      | 2.85     |
+| 9               | 13.214676 			   | 3.06     |
+| 10              | 12.171585                      | 3.32     |
+| 11              | 11.528257                      | 3.50     |
+| 12              | 11.047219                      | 3.66     |
+| 13              | 10.450436			   | 3.87     |
+| 14              | 10.201222                      | 3.96     |
+| 15              | 9.711673                       | 4.16     |
+| 16		  | 9.673589 			   | 4.18     |
+| 17 		  | 9.255910			   | 4.37     |
+| 18              | 8.944784 			   | 4.52     |
+| 19              | 8.661826                       | 4.67     |
+| 20 		  | 8.475503 			   | 4.77     |
+| 21		  | 8.252831			   | 4.90     |
+| 22		  | 8.051927			   | 5.02     |
+| 23		  | 7.942420			   | 5.09     |
+| 24		  | 7.886527			   | 5.13     |
+
+	
+</td><td>
+
+| Numero di slave | Tempo di esecuzione in secondi | Speed-up | Numero File |
+| :-------------: | :----------------------------: | :------: | :---------: |
+
+
+</td></tr> </table>
+
+
 
 ### Weak Scalability
 
