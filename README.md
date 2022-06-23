@@ -374,4 +374,7 @@ Strong Scalability         |  Weak Scalability
 
 ## Analisi dei Risultati
 Il lavoro svolto, propone una soluzione di risoluzione del problema del Word Count. L'utilizzo del parallelismo, apporta dei miglioramenti all'algoritmo ma tali miglioramenti potrebbero essere incrementati cambiando soluzione.
+
 Infatti analizzando il grafico della strong scalability si può notare come lo speed-up aumenta pian piano al decrescere del tempo di esecuzione incrementando il numero delle vCPU. Questo fenomeno è dovuto ad un aumento dell'overhead provocato delle numerose comunicazioni che devono essere sostenute tra i diversi processori, in quanto gli SLAVE e il MASTER in tale soluzione comunicano costantemente.
+
+I risultati ottenuti dalla weak scalability, evidenziamo come il carico delle diverse parole in questo caso viene suddiviso tra i diversi processi  
