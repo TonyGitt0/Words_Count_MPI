@@ -368,7 +368,7 @@ La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogn
 
 </td></tr> </table>
 
-Solarized dark             |  Solarized Ocean
+Strong Scalability         |  Weak Scalability
 :-------------------------:|:-------------------------:
 ![](./benchmarks/strong_scalability.png)  |  ![](./benchmarks/weak_scalability.png)
 
