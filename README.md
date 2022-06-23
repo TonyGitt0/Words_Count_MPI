@@ -304,7 +304,7 @@ Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER
 L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito sono riportati i risultati:
 
 ### Strong Scalability
-La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 115 Mb. 
+La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 115 Mb. Si è pensato inoltre di suddividere tale file in differenti 24 file ed effettuare lo stesso test.
 
 <table>
 <tr><th>Speed-up (1 file) </th><th>Speed-up (24-file)</th></tr>
@@ -342,7 +342,30 @@ La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogn
 
 | Numero di slave | Tempo di esecuzione in secondi | Speed-up | Numero File |
 | :-------------: | :----------------------------: | :------: | :---------: |
-
+| 1               | 13.769076			   | 1.00     | 1           |
+| 2 		  |  8.743799                      | 1.57     | 2           |
+| 3               | 11.734439                      | 1.17     | 3           |
+| 4               | 10.361816                      | 1.32     | 4           |
+| 5               | 10.184212                      | 1.35     | 5           |
+| 6               | 10.497911                      | 1.31     | 6           |
+| 7               | 9.862291                       | 1.39     | 7           |
+| 8               | 9.127457                       | 1.50     | 8           |
+| 9               | 8.728823		           | 1.57     | 9           |
+| 10              | 8.519890                       | 1.61     | 10          |
+| 11              | 8.385061                       | 1.64     | 11          |
+| 12              | 8.123505                       | 1.69     | 12          |
+| 13              | 8.013266			   | 1.71     | 13          |
+| 14              | 7.825753 			   | 1.75     | 14          |
+| 15              | 7.878313                       | 1.74     | 15          |
+| 16		  | 8.048275			   | 1.71     | 16          |
+| 17 		  | 7.545903			   | 1.82     | 17          |
+| 18              | 7.635540			   | 1.80     | 18          |
+| 19              | 7.434094                       | 1.85     | 19          |
+| 20 		  | 7.517510			   | 1.83     | 20          |
+| 21		  | 7.351396			   | 1.87     | 21          |
+| 22		  | 7.299361			   | 1.88     | 22          |
+| 23		  | 7.200272			   | 1.91     | 23          |
+| 24		  | 7.293934			   | 1.88     | 24          |
 
 </td></tr> </table>
 
