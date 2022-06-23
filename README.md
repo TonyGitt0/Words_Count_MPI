@@ -17,8 +17,7 @@ ID Project 01312 % 5 == 2
 	* [File Processing](#file-processing)
 	* [Test](#test)
 * [Benchmarks](#benchmarks)
-	* [Weak Scalability](#weak-scalability)
-	* [Strong Scalability](#strong-scalability)
+	* [Strong Scalability e Weak Scalability](#strong-scalability-e-weak-scalability)
 * [Analisi dei risultati](#analisi-dei-risultati)
 
 ## Introduzione
@@ -303,7 +302,7 @@ Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER
 ## Benchmarks
 L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito sono riportati i risultati:
 
-### Strong Scalability
+### Strong Scalability e Weak Scalability
 La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 115 Mb. Si è pensato inoltre di suddividere tale file in differenti 24 file ed effettuare lo stesso test.
 
 <table>
