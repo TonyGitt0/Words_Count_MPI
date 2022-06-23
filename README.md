@@ -303,7 +303,7 @@ Termiata tale elaborazione vi sarà un scambio di dati tra gli SLAVE e il MASTER
 L'agoritmo è stato testato su **Google Cloud Platform** su un cluster di 6 macchine **e2-standard-4**. Ogni macchina è dotata di 4 VCPUs, quindi per un totale di 24 VCPUs. L'algorimo è stato testato in termini di **strong scalability** e **weak scalability**. Per automatizzare le esecuzioni del programma per i diversi test sono stati realizzati degli script bash che si possono trovare nella cartella **scripts**. Di seguito sono riportati i risultati:
 
 ### Strong Scalability e Weak Scalability
-La scalabilità forte è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 115 Mb. Si è pensato inoltre di suddividere tale file in differenti 24 file ed effettuare lo stesso test.
+La strong scalability è stata misurata eseguendo più volte l'algoritmo, ad ogni esecuzione il numero di vCPU è stato incrementato da 1 vCPU a 24 vCPU. I test sono stati effettuati utilizzando sempre lo stesso input. L'input considerato è un file di testo con una grandezza di ≈ 115 Mb. Si è pensato inoltre di suddividere tale file in differenti 24 file , tutti di uguali dimensioni, per effetturare la misurazione della weak scalability. La weak è stata misurata eseguendo l'algoritmo più volte su un numero di vCPU pari al numero di file utilizzati per l'input.
 
 <table>
 <tr><th>Strong Scalability [Speed-up (1 file)] </th><th> Weak Scalability </th></tr>
@@ -372,6 +372,6 @@ Strong Scalability         |  Weak Scalability
 :-------------------------:|:-------------------------:
 ![](./benchmarks/strong_scalability.png)  |  ![](./benchmarks/weak_scalability.png)
 
-### Weak Scalability
-
 ## Analisi dei Risultati
+Il lavoro svolto, propone una soluzione di risoluzione del problema del Word Count. L'utilizzo del parallelismo, apporta dei miglioramenti all'algoritmo ma tali miglioramenti potrebbero essere incrementati cambiando soluzione.
+Infatti analizzando il grafico della strong scalability si può notare come lo speed-up aumenta pian piano al decrescere del tempo di esecuzione incrementando il numero delle vCPU. Questo fenomeno è dovuto ad un aumento dell'overhead provocato delle numerose comunicazioni che devono essere sostenute tra i diversi processori, in quanto gli SLAVE e il MASTER in tale soluzione comunicano costantemente.
