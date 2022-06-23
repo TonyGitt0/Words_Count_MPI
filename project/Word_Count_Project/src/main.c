@@ -6,7 +6,8 @@
 #include <mpi.h>
 
 #define TOTALWORDS 100000000
-#define MAX_SPLIT 100000
+#define MAX_SPLIT 1000
+#define NUM_FILES 2
 #define MASTER 0
 
 
@@ -109,7 +110,7 @@ int main(int argc, char *argv[])
 
        //&files e una variabile di appoggio in cui travasiamo il numero di file passati dall utente
 
-        printf("FILE PROCESSING\n"); 
+        printf("FILE PROCESSING\n");
         printf("------------------------------------------------\n");
         numWordForProcess(words_for_processor, tot_words_in_files, size);
         for (int i = 0; i < size; i++)
@@ -141,7 +142,6 @@ int main(int argc, char *argv[])
         while (wordForProcessor[index_struct].rank == 0 && index_struct < numSplit)
         {
             index_struct++;
-            // stratForZero variabile che indica
             startForZero++;
         }
 
@@ -157,53 +157,49 @@ int main(int argc, char *argv[])
                 space++;
             }
             // inviamo agli altri processi le porzioni destinate a loro stessi
-            
             MPI_Send(&wordForProcessor[index_struct_for_process], space, dt_received, rank, tag, MPI_COMM_WORLD);
         }
         // contiamo le occorenze delle parole soltanto per il processo zero
         total_new_words = wordCount(dictionary, wordForProcessor, startForZero,size);
 
-        int sizeForProcessor = 0;
         for (int rank = 1; rank < size; rank++)
         {
+            count = 0;
             MPI_Recv(words_to_master, TOTALWORDS, d_words, rank, tag, MPI_COMM_WORLD, &status);
-            MPI_Get_count(&status, d_words, &sizeForProcessor);
+            MPI_Get_count(&status, d_words, &count);
+
+            printf("rank: %d, count:%d",rank,count);
 
             // count è il numero di elementi ricevuti da un processo
             // new_word invece sono le parole che abbiamo (almeno una volta)
-            total_new_words = concatWordCount(dictionary, words_to_master, sizeForProcessor, total_new_words);
+            total_new_words = concatWordCount(dictionary, words_to_master, count, total_new_words);
         }
 
         getDataOfWOrd(dictionary, total_new_words);
         printf("Total words (no-occurency) in all file is: %d\n", total_new_words);
-        double time_end = MPI_Wtime();
-        double time = time_end - time_start;
-        printf("Time: %lf\n\n", time);
-
     }
     else
     {
-        int count = 0;
+        count = 0;
         int new_word_single_processor = 0;
         MPI_Recv(wordForProcessor, MAX_SPLIT, dt_received, 0, tag, MPI_COMM_WORLD, &status);
         MPI_Get_count(&status, dt_received, &count);
 
-       
-        new_word_single_processor = wordCount(dictionary, wordForProcessor, count ,size);       
-        MPI_Ssend(dictionary, new_word_single_processor, d_words, 0, tag, MPI_COMM_WORLD);
+        new_word_single_processor = wordCount(dictionary, wordForProcessor, count ,size);
+        MPI_Send(dictionary, new_word_single_processor, d_words, 0, tag, MPI_COMM_WORLD);
     }
 
     MPI_Type_free(&d_words);
     MPI_Type_free(&dt_received);
 
     // p = 5 file = 12 0.34/0.36
-   /* MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     if(myrank == 0)
     {
         double time_end = MPI_Wtime();
         double time = time_end - time_start;
         printf("Time: %lf\n\n", time);
-    } */
+    }
     MPI_Finalize();
     return 0;
 }

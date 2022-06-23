@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "utils.h"
+#define NUM_FILES 2
 #define MAXWORDS 10000
 
 // TESTED
@@ -142,11 +143,11 @@ int numWordInFile(char *name_file)
 // In this function include the use of MASTER
 int setStructureWordForProcessForSplitFileForProcess(StructWordForProcess *wordsForProcess, int num_proc, int *num_words, File *File)
 {
-    int my_rank = 0; //processor
-    int element_in_struct = 0; //strutture
-    int file = 0; //file
+    int my_rank = 0;
+    int element_in_struct = 0;
+    int file = 0;
 
-    int start = 0; //offset
+    int start = 0;
 
     while (my_rank < num_proc)
     {
@@ -299,7 +300,7 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
             printf("FILE ERROR\n");
             return -1;
         }
-        //printf("SLAVE %d\n:",structWord[i].rank);
+
         // leggiamo riga per riga il file
         // consideriamo per ora che una riga può raggiunre le dimensioni di 300 caratteri
         while ((fgets(allWords, sizeof(allWords), fPointer)) != NULL)
@@ -313,25 +314,25 @@ int wordCount(WordFreq *dictionary, StructWordForProcess *structWord, int count,
                 lineToCompare = (structWord[i].end - structWord[i].start);
                 //printf("single_word: %d\n", lineToCompare);
                 strtok(allWords, "\n");
-                //char *p = strtok(allWords, " ");
-                //while (p != NULL)
-                //{
+                char *p = strtok(allWords, " ");
+                while (p != NULL)
+                {
                     
-                    if ((index_word = isWordNew(dictionary, /*p*/ allWords, lineToCompare, num_proc)) == -3)
+                    if ((index_word = isWordNew(dictionary, p, lineToCompare, num_proc)) == -3)
                     {
                         //printf("P INTERNO ----- %s\n",p);
-                        strcpy(dictionary[new_word_vector].word, /*p*/ allWords);
+                        strcpy(dictionary[new_word_vector].word, p);
                         dictionary[new_word_vector].word_occurency = 1;
-                        //printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[new_word_vector].word, dictionary[new_word_vector].word_occurency);
+                        // printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[new_word_vector].word, dictionary[new_word_vector].word_occurency);
                         new_word_vector++;
                     }
                     else
                     {
                         dictionary[index_word].word_occurency++;
-                        //printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[index_word].word, dictionary[index_word].word_occurency);
+                        // printf("WORD:  %s ----> OCCURENCES:  %d \n", dictionary[index_word].word, dictionary[index_word].word_occurency);
                     }
-                   // p = strtok(NULL, " ");
-                //}
+                    p = strtok(NULL, " ");
+                }
             }
         }
         line = 0;
@@ -376,10 +377,15 @@ void getDataOfWOrd(WordFreq *dictionary, int total_new_words)
     printf("\n");
     for (int n = 0; n < total_new_words; n++)
     {
-        //printf("word:  %s , occurency: %d\n", dictionary[n].word, dictionary[n].word_occurency);
+//        printf("word:  %s , occurency: %d\n", dictionary[n].word, dictionary[n].word_occurency);
         check += dictionary[n].word_occurency;
     }
     printf("\n");
     printf("CHECK WORD OCCURENCY: %d", check);
     printf("\n");
 }
+
+// n = pari f = pari 
+// n = dispari f = dispari
+// n = pari  f = dispari
+// n = dispari f = pari
