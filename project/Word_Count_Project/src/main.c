@@ -33,14 +33,11 @@ int main(int argc, char *argv[])
     WordFreq *words_to_master = (WordFreq *)malloc(sizeof(WordFreq) * TOTALWORDS);
 
     // FIRST STRUCT
-    const int n_items_fs = 4;        // numero di blocchi nel nuovo tipo equivale al numero di dati nel nuovo datatype
-    int blocklengths_fs[n_items_fs]; // dimesione (non in termini di byte ma di grandezza) dell elemento in un blocco
-
-    // dt_received è il nuovo tipo di dato
-    MPI_Datatype dt_received, types_fs[n_items_fs];       // types rappresenta il tipo di dati archiviati in quel blocco
-    MPI_Aint offsets_fs[n_items_fs], lower_bound, extent; // offsets rappresenta la posizone di un particolare blocco all'interno del nuovo tipo
-    // extent indica "l'estensione" all'interno del blocco, cioè lo spazio in byte occupato dai dati in uno specifico blocco del nuovo dataType
-    // lower_bound invede indica il minimo, ovvero l'inizio della totale extent
+    const int n_items_fs = 4;       
+    int blocklengths_fs[n_items_fs]; 
+   
+    MPI_Datatype dt_received, types_fs[n_items_fs];     
+    MPI_Aint offsets_fs[n_items_fs], lower_bound, extent;
 
     offsets_fs[0] = offsetof(StructWordForProcess, name_file);
     types_fs[0] = MPI_CHAR;
@@ -108,7 +105,6 @@ int main(int argc, char *argv[])
         tot_words_in_files = sumAllWordsInDifferentFile(list_files, specFile, &files);
         printf("Number of words in all files: %ld for %d processes\n\n", tot_words_in_files, size);
 
-       //&files e una variabile di appoggio in cui travasiamo il numero di file passati dall utente
 
         printf("FILE PROCESSING\n");
         printf("------------------------------------------------\n");
@@ -117,10 +113,6 @@ int main(int argc, char *argv[])
         {
             printf("number of words is: %d for processor: %d\n", words_for_processor[i], i);
         }
-
-        /* 
-         L'ULTIMA PAROLA IN UN FILE DEVE ESSERE SEGUITA DA UNO SPAZIO
-        */
 
         numSplit = setStructureWordForProcessForSplitFileForProcess(wordForProcessor, size, words_for_processor, specFile);
         printf("Number of Split: %d\n\n", numSplit);
@@ -136,16 +128,11 @@ int main(int argc, char *argv[])
         int startForZero = 0;
         int total_new_words = 0;
 
-        // scorriamo nella struttura per lasciare le porzioni destinate al processo 0
-        // il secondo controllo lo facciamo quando usiamo un solo processo in quanto index_struct corrisponderà al numero di file che il singolo processo
-        // (ESEGUITO IN SOLITATIA NP=1) dovrà analizzare
         while (wordForProcessor[index_struct].rank == 0 && index_struct < numSplit)
         {
             index_struct++;
             startForZero++;
         }
-
-        //printf("Index Struct: %d\n",index_struct);
 
         for (int rank = 1; rank < size; rank++)
         {
@@ -156,10 +143,8 @@ int main(int argc, char *argv[])
                 index_struct++;
                 space++;
             }
-            // inviamo agli altri processi le porzioni destinate a loro stessi
             MPI_Send(&wordForProcessor[index_struct_for_process], space, dt_received, rank, tag, MPI_COMM_WORLD);
         }
-        // contiamo le occorenze delle parole soltanto per il processo zero
         total_new_words = wordCount(dictionary, wordForProcessor, startForZero,size);
 
         for (int rank = 1; rank < size; rank++)
@@ -169,9 +154,6 @@ int main(int argc, char *argv[])
             MPI_Get_count(&status, d_words, &count);
 
             printf("rank: %d, count:%d",rank,count);
-
-            // count è il numero di elementi ricevuti da un processo
-            // new_word invece sono le parole che abbiamo (almeno una volta)
             total_new_words = concatWordCount(dictionary, words_to_master, count, total_new_words);
         }
 
@@ -192,7 +174,6 @@ int main(int argc, char *argv[])
     MPI_Type_free(&d_words);
     MPI_Type_free(&dt_received);
 
-    // p = 5 file = 12 0.34/0.36
     MPI_Barrier(MPI_COMM_WORLD);
     if(myrank == 0)
     {
