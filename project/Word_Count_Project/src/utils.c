@@ -7,7 +7,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "utils.h"
-#define MAXWORDS 10000
 
 
 int sumAllWordsInDifferentFile(char **list_files, File *singleFile, size_t *elem)
@@ -345,7 +344,7 @@ void getDataOfWOrd(WordFreq *dictionary, int total_new_words)
 
 
     result_cvs = fopen("./result_csv","w+");
-    fprintf(result_cvs,"word,occurency\n");
+    fprintf(result_cvs,"WORD,OCCURENCY\n");
     printf("\n");
     for (int n = 0; n < total_new_words; n++)
     {
@@ -353,7 +352,7 @@ void getDataOfWOrd(WordFreq *dictionary, int total_new_words)
         check += dictionary[n].word_occurency;
     }
     printf("\n");
-    printf("CHECK WORD OCCURENCY: %d", check + 1);
+    printf("CHECK WORD OCCURENCY: %d", check);
     printf("\n");
 }
 
