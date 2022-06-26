@@ -31,7 +31,6 @@ typedef struct{
 }WordFreq;
 
 
-//TESTED METHOD
 extern int numFilesInDirectory(char *path);
 extern int numWordInFile(char *name_file);
 extern char **listOfFile(char *directory_path,size_t *elems,int num_file);
