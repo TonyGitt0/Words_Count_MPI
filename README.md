@@ -374,7 +374,7 @@ Strong Scalability         |  Weak Scalability
 
 Time Strong Scalability         | Time Weak Scalability
 :-------------------------:|:-------------------------:
-![](./benchmarks/t_strong.png)  |  ![](./benchmarks/t_weak.png)
+![](./benchmarks/t_strong.jpg)  |  ![](./benchmarks/t_weak.jpg)
 
 ## Analisi dei Risultati
 Il lavoro svolto, propone una soluzione di risoluzione del problema del Word Count. L'utilizzo del parallelismo, apporta dei miglioramenti all'algoritmo ma tali miglioramenti potrebbero essere incrementati cambiando soluzione.
