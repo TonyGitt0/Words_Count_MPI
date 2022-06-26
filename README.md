@@ -377,4 +377,4 @@ Il lavoro svolto, propone una soluzione di risoluzione del problema del Word Cou
 
 Infatti analizzando il grafico della strong scalability si può notare come lo speed-up aumenta pian piano al decrescere del tempo di esecuzione incrementando il numero delle vCPU. Questo fenomeno è dovuto ad un aumento dell'overhead provocato delle numerose comunicazioni che devono essere sostenute tra i diversi processori, in quanto gli SLAVE e il MASTER in tale soluzione comunicano costantemente.
 
-I risultati ottenuti dalla weak scalability, evidenziamo come il carico delle diverse parole in questo caso viene suddiviso tra i diversi processi  
+I risultati ottenuti dalla weak scalability, evidenziamo come il carico delle diverse parole in questo caso viene suddiviso tra i diversi processi. Dal tabella riportata di sopra, possiamo notare che i tempi di esecuzione reali non rispettano il comportamento atteso, infatti il tempo di esecuzione tende ad aumentare, mentre il comportamento non dovrebbe variare di molto. Anche qui entra in gioco il fattore overhead e questo ci porta a concludere che il tempo di esecuzione aumenta all'aumentare del numero di processori coinvolti. 
