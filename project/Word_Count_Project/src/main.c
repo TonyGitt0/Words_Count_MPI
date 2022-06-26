@@ -6,7 +6,7 @@
 #include <mpi.h>
 
 #define TOTALWORDS 100000000
-#define MAX_SPLIT 1000
+#define MAX_SPLIT 100
 #define NUM_FILES 2
 #define MASTER 0
 
@@ -153,7 +153,6 @@ int main(int argc, char *argv[])
             MPI_Recv(words_to_master, TOTALWORDS, d_words, rank, tag, MPI_COMM_WORLD, &status);
             MPI_Get_count(&status, d_words, &count);
 
-            printf("rank: %d, count:%d",rank,count);
             total_new_words = concatWordCount(dictionary, words_to_master, count, total_new_words);
         }
 
